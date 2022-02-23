@@ -1,6 +1,8 @@
+
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
 #include <i2c_t3.h>
+#include <PulsePosition.h>
 //#include <Wire.h>
 
 #define enablePin 22
@@ -32,8 +34,8 @@ void resetDynamicAnimation(void);
 byte serialState = 0;
 unsigned long packetTime = 0;
 unsigned long packetTimeout = 200;
-byte packet[10];
-byte bytesRead = 0;
+int packet[6];
+int bytesRead = 0;
 
 unsigned long lastReceived = 0;
 
@@ -42,7 +44,7 @@ byte flip = 0;
 int16_t thumbX = 0;
 int16_t thumbY = 0;
 uint16_t throt = 0;
-uint16_t head = 0;
+int16_t head = 0;
 byte en = 0;
 //leds
 Adafruit_DotStar strip = Adafruit_DotStar(5, DOTSTAR_GBR);
@@ -150,9 +152,11 @@ void watchdog_isr() {
   digitalWrite(enablePin, HIGH);
 }
 
+PulsePositionInput RC;
+
 void setup() {
   Serial.begin(57600);
-  Serial1.begin(57600);
+  RC.begin(5);
   SPI.begin();
   pinMode(enablePin, OUTPUT);
   digitalWrite(enablePin, HIGH);
@@ -258,6 +262,3 @@ void loop() {
       break;
   }
 }
-
-
-
