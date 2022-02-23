@@ -1,4 +1,8 @@
-# MeltyHalo
+# MeltyBrian - a MeltyHalo (by swallenhardware) implementation 
+An implementation of MeltyHalo, Meltybrain software for Teensy 3.2 by swallenhardware (Spencer Allen) for an accelerometer only robot controlled by Flysky FS-I6 (with FS-iA6B receiver).
+Remember to remove unnecessary headers from Adafruit_BusIO library as they are incompatible with i2c - leave only Adafruit_SPIDevice.h and Adafruit_SPIDevice.cpp
+Many thanks to the original authors of MeltyHalo!
+# Original Description
 Arduino code to control my MeltyBrain battlebot
 
 This Arduino project is the control code for Halo, the beetleweight Battlebot designed by Spencer Allen and Pierce Jensen.
