@@ -76,6 +76,7 @@ void receivePacket() {
   }
   //heading - 
   head = map((uint16_t) packet[5], 1000, 2000, -180, 180);
+  if(head > -15 && head < 15) head = 0;
   //enable
   //en = packet[9];
   en = 1;
@@ -87,7 +88,7 @@ void receivePacket() {
    meltyAngle = (uint16_t) calcAngle;
   }
 }
-
+int motorSpd;
 void loop() {
   Serial.print("Channels available: ");
   Serial.print(RC.available());
@@ -115,6 +116,12 @@ void loop() {
   //Motor control
   //if(tankOverride) ESC.setRunSpeed(0, map(thumbY, -100, 100, 1, 1999));
   //else ESC.setRunSpeed(1500);
-  if(tankOverride) ESC.write(map(thumbY,-100,100,0,180));
-  else ESC.write(91);
+
+  if(tankOverride) {
+    motorSpd = map(thumbY,-100,100,0,180);
+    if(motorSpd > 165) motorSpd = 165;
+    else if(motorSpd < 19) motorSpd = 19;
+    ESC.write(motorSpd);
+  }
+  else ESC.write(90);
   }

@@ -104,12 +104,22 @@ uint16_t getBatteryVoltage() { //returns voltage in millivolts
 
 
 void setMotorSpeed(Servo motorObj, int spd) {
+  int motorSpd;
   spd = constrain(spd, -100, 100);//make sure our speed value is valid. This lets us be lazier elsewhere
+  
   //apply a deadband
   if(spd < 5 && spd > -5) spd = 0;
 
   if(motorObj == motor1) spd *= -1;
 
+  //map to servo
+  motorSpd = map(spd, -100, 100, 0, 180);
+  
+  //apply min and max throttle
+  if(motorSpd > 165) motorSpd = 165;
+  else if (motorSpd < 19) motorSpd = 19;
+
+  //send servo data to ESC
   motorObj.write(map(spd, -100, 100, 0, 180));
 }
 

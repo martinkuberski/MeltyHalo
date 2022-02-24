@@ -47,6 +47,7 @@ void receivePacket() {
   }
   //heading - 
   head = map((uint16_t) packet[5], 1000, 2000, -180, 180);
+  if(head > -15 && head < 15) head = 0;
   //enable
   //en = packet[9];
   en = 1;
