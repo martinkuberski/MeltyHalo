@@ -3,12 +3,13 @@
 #include <SPI.h>
 #include <i2c_t3.h>
 #include <PulsePosition.h>
+#include <Servo.h>
 //#include <Wire.h>
 
-#define enablePin 22
+#define enablePin 21
 #define PIN_IR 15
-#define motor1 3
-#define motor2 4
+#define motor1pin 23
+#define motor2pin 22
 #define vBatt A0
 
 //animations
@@ -46,6 +47,11 @@ int16_t thumbY = 0;
 uint16_t throt = 0;
 int16_t head = 0;
 byte en = 0;
+
+//motors
+Servo motor1;
+Servo motor2;
+
 //leds
 Adafruit_DotStar strip = Adafruit_DotStar(5, DOTSTAR_GBR);
 
@@ -60,7 +66,7 @@ uint16_t meltyThrottle = 0;
 #define BEACON_SENSING 0x01//if this is defined, we are angle sensing using only the infrared receiver
 #define ACCEL_SENSING 0x02//if this is defined, we are angle sensing using only the accelerometer
 #define HYBRID_SENSING 0x03//if this is defined, we are angle sensing using both the beacon and the accelerometer
-uint8_t senseMode = HYBRID_SENSING;
+uint8_t senseMode = ACCEL_SENSING;
 
 //BEACON
 boolean beacon = false;//this variable keeps track of the status of the beacon internally. If this variable and the digital read don't match, it's a rising or falling edge
@@ -97,14 +103,14 @@ uint16_t getBatteryVoltage() { //returns voltage in millivolts
 }
 
 
-void setMotorSpeed(int motor, int spd) {
+void setMotorSpeed(Servo motorObj, int spd) {
   spd = constrain(spd, -100, 100);//make sure our speed value is valid. This lets us be lazier elsewhere
   //apply a deadband
   if(spd < 5 && spd > -5) spd = 0;
 
-  if(motor == motor1) spd *= -1;
+  if(motorObj == motor1) spd *= -1;
 
-  analogWrite(motor, map(spd, -100, 100, 64, 128));
+  motorObj.write(map(spd, -100, 100, 0, 180));
 }
 
 void goIdle() {
@@ -154,9 +160,12 @@ void watchdog_isr() {
 
 PulsePositionInput RC;
 
+
 void setup() {
   Serial.begin(57600);
   RC.begin(5);
+  motor1.attach(motor1pin);
+  motor2.attach(motor2pin);
   SPI.begin();
   pinMode(enablePin, OUTPUT);
   digitalWrite(enablePin, HIGH);
@@ -183,7 +192,7 @@ void setup() {
 
   NVIC_ENABLE_IRQ(IRQ_WDOG);//enable watchdog interrupt
 
-  analogWriteFrequency(3, 250);//this changes the frequency of both motor outputs
+  //analogWriteFrequency(3, 250);//this changes the frequency of both motor outputs
 
   configAccelerometer();
 

@@ -1,6 +1,15 @@
 #include <PulsePosition.h>
+//motor libs
+//#include <DMAChannel.h>
+//#include <array>
+//#include "DShot.h"
+#include <Servo.h>
 
+//uint8_t pins[] = {22};
+//DshotMotor ESC(1, pins);
 PulsePositionInput RC;
+Servo ESC;
+
 //var declarations
 int headAngle;
 #define SERIAL_WAIT 0
@@ -27,7 +36,9 @@ uint8_t state = 3;
 
 void setup() {
   Serial.begin(9600);
+  //if(!ESC.armed) ESC.armMotorESC();
   RC.begin(5);
+  ESC.attach(22);
 }
 
 void pollSerial() {
@@ -101,4 +112,9 @@ void loop() {
   Serial.print(" Adjusted angle: ");
   Serial.print(headAngle);
   Serial.println();
+  //Motor control
+  //if(tankOverride) ESC.setRunSpeed(0, map(thumbY, -100, 100, 1, 1999));
+  //else ESC.setRunSpeed(1500);
+  if(tankOverride) ESC.write(map(thumbY,-100,100,0,180));
+  else ESC.write(91);
   }
