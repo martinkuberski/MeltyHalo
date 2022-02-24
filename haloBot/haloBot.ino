@@ -215,6 +215,11 @@ void setup() {
   goIdle();
 }
 
+//DEBUG: ACCELEROMETER
+int16_t zAccelDBG;
+int16_t yAccelDBG;
+uint16_t accelAngleDBG = 0;
+
 void loop() {
 
   //Bark bark
@@ -229,8 +234,17 @@ void loop() {
   if(failsafeCount >= 10 && state != STATE_IDLE) {
     en = 0x0;
     goIdle();
+    Serial.println("Transmitter connection error, engaging failsafe...");
   }
-
+  //DEBUG: ACCELEROMETER
+  runAccelerometer();
+  Serial.print("YACC: ");
+  Serial.print(yAccelDBG);
+  Serial.print(" ZACC: ");
+  Serial.print(zAccelDBG);
+  Serial.print(" ANGLE: ");
+  Serial.println(accelAngleDBG);
+ 
   /*
   //check if battery voltage is below 3.2V/cell cutoff (2.5V/cell under load)
   uint16_t batteryReading  = getBatteryVoltage();

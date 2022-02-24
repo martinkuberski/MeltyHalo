@@ -92,6 +92,9 @@ void runAccelerometer() {
     //int16_t xAccel = (((int16_t) accelBuf[1]) << 8) | (int16_t) accelBuf[0];//represents acceleration tangential to the ring, not useful to us
     int16_t yAccel = (((int16_t) accelBuf[3]) << 8) | (int16_t) accelBuf[2];//represents acceleration axial to the ring, which shows which way the bot is flipped
     zAccel = (((int16_t) accelBuf[5]) << 8) | (int16_t) accelBuf[4];//represents acceleration radial to the ring, which is a measure of rotation speed
+    //DEBUG:
+    yAccelDBG = yAccel;
+    zAccelDBG = zAccel;
 
     //shift all of the old values down
     for(int i=1; i>0; i--) {
@@ -122,4 +125,6 @@ void runAccelerometer() {
     uint32_t deltaT = newTime - accelMeasTime[0];
     accelAngle = (angleAtLastMeasurement + (deltaT/periodPredicted + deltaT/robotPeriod[0])/2) % 360;
   }
+  //DEBGUG: 
+  accelAngleDBG = accelAngle; 
 }
