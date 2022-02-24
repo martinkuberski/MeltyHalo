@@ -39,6 +39,7 @@ int packet[6];
 int bytesRead = 0;
 
 unsigned long lastReceived = 0;
+uint8_t failsafeCount = 0;
 
 //controls
 byte flip = 0;
@@ -110,7 +111,7 @@ void setMotorSpeed(Servo motorObj, int spd) {
   //apply a deadband
   if(spd < 5 && spd > -5) spd = 0;
 
-  if(motorObj == motor1) spd *= -1;
+  if(&motorObj == &motor1) spd *= -1;
 
   //map to servo
   motorSpd = map(spd, -100, 100, 0, 180);
@@ -178,6 +179,8 @@ void setup() {
   motor2.attach(motor2pin);
   SPI.begin();
   pinMode(enablePin, OUTPUT);
+  pinMode(13, OUTPUT); //Teensy LED output
+  digitalWrite(13, HIGH);
   digitalWrite(enablePin, HIGH);
 
   pinMode(PIN_IR, INPUT);
@@ -220,8 +223,10 @@ void loop() {
   //check for incoming messages
   pollSerial();
 
-  //make sure comms haven't timed out
-  if(micros() - lastReceived > 1000*1000 && state != STATE_IDLE) {
+  //make sure comms haven't timed out - failsafe values on FS-I6 set as Ch1:43%, Ch2: -46%, Ch3: -98%, Ch4: -55%, Ch5: 100%, Ch6: 30%
+  if(throt == 1 && thumbX == 43 && thumbY == -46 && head == 53) failsafeCount++;
+  else failsafeCount = 0;
+  if(failsafeCount >= 10 && state != STATE_IDLE) {
     en = 0x0;
     goIdle();
   }
@@ -280,4 +285,8 @@ void loop() {
     default:
       break;
   }
+
+  //Teensy LED
+  if(micros() % 3000 == 0) digitalWrite(13, HIGH);
+  if(micros() % 5000 == 0) digitalWrite(13, LOW);
 }

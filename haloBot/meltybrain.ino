@@ -68,8 +68,8 @@ void runMeltyBrain() {
 
   //apply the manual angle correction
   angle += head;
-  if(angle < 0) headAngle += 360;
-  if(angle > 360) headAngle -= 360;
+  if(angle < 0) angle += 360;
+  if(angle > 360) angle -= 360;
 
   //MOTOR COMMAND
   //first check if the melty throttle is high enough for translation

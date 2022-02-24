@@ -1,12 +1,6 @@
 #include <PulsePosition.h>
-//motor libs
-//#include <DMAChannel.h>
-//#include <array>
-//#include "DShot.h"
 #include <Servo.h>
 
-//uint8_t pins[] = {22};
-//DshotMotor ESC(1, pins);
 PulsePositionInput RC;
 Servo ESC;
 
@@ -39,6 +33,7 @@ void setup() {
   //if(!ESC.armed) ESC.armMotorESC();
   RC.begin(5);
   ESC.attach(22);
+  pinMode(13, OUTPUT);
 }
 
 void pollSerial() {
@@ -89,6 +84,7 @@ void receivePacket() {
   }
 }
 int motorSpd;
+int failsafe;
 void loop() {
   Serial.print("Channels available: ");
   Serial.print(RC.available());
@@ -113,15 +109,24 @@ void loop() {
   Serial.print(" Adjusted angle: ");
   Serial.print(headAngle);
   Serial.println();
-  //Motor control
-  //if(tankOverride) ESC.setRunSpeed(0, map(thumbY, -100, 100, 1, 1999));
-  //else ESC.setRunSpeed(1500);
 
+  //Teensy LEDs
+  if(micros() % 3000 == 0) digitalWrite(13, HIGH);
+  if(micros() % 5000 == 0) digitalWrite(13, LOW);
+  
+  //Motor control
   if(tankOverride) {
     motorSpd = map(thumbY,-100,100,0,180);
     if(motorSpd > 165) motorSpd = 165;
     else if(motorSpd < 19) motorSpd = 19;
     ESC.write(motorSpd);
-  }
-  else ESC.write(90);
+    }
+    else ESC.write(90);
+
+  //Failsafe
+  if(tankOverride && throt == 1 && thumbX == 43 && thumbY == -46 && head == 53) failsafe++;
+  if(failsafe == 10) {
+    Serial.println("CONNECTION TERMINATED, FAILSAFE ENGAGED!");
+    while(true);
+    }
   }

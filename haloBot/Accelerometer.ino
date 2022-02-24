@@ -83,8 +83,10 @@ void runAccelerometer() {
     
     uint8_t accelBuf[6];
     if(readI2CRegNBlocking(ADDR_ACCEL, OUT_X_L, 6, accelBuf) > 0) {
-      senseMode = BEACON_SENSING;//if communication with the accelerometer ever fails, we revert to beacon-only mode
+      //senseMode = BEACON_SENSING;//if communication with the accelerometer ever fails, we revert to beacon-only mode (disabled, accelerator only bot...);
       Serial.println("accelerometer failed");
+      digitalWrite(13, LOW);
+      goIdle();
     }
   
     //int16_t xAccel = (((int16_t) accelBuf[1]) << 8) | (int16_t) accelBuf[0];//represents acceleration tangential to the ring, not useful to us
@@ -121,4 +123,3 @@ void runAccelerometer() {
     accelAngle = (angleAtLastMeasurement + (deltaT/periodPredicted + deltaT/robotPeriod[0])/2) % 360;
   }
 }
-
